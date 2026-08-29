@@ -279,8 +279,10 @@ self.subscription = self.create_subscription(
 
 The subscriber’s constructor and callback don’t include any timer definition, because it doesn’t need one. Its callback gets called as soon as it receives a message.
 
-The callback definition simply prints an info message to the console, along with the data it received. Recall that the publisher defines msg.data = 'Hello World: %d' % self.i
-
+The callback definition simply prints an info message to the console, along with the data it received. Recall that the publisher defines 
+```python
+msg.data = 'Hello World: %d' % self.i
+```
 ```python
 def listener_callback(self, msg):
     self.get_logger().info('I heard: "%s"' % msg.data)
