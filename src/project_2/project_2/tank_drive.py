@@ -1,7 +1,7 @@
 import asyncio
 import rclpy
-from custom_interfaces.srv import AxisState
-from custom_interfaces.msg import ControlMessage, ControllerStatus, OdriveStatus
+from odrive_can.srv import AxisState
+from odrive_can.msg import ControlMessage, ControllerStatus, ODriveStatus
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
@@ -27,6 +27,8 @@ class TankDriveNode(Node):
             liveliness=LivelinessPolicy.AUTOMATIC,
             lifespan=Duration(seconds=0.1, nanoseconds=0),
         )
+        self.ctrl_msg_qos = QoSProfile(history=HistoryPolicy.KEEP_ALL)
+
         self.qos_sub = QoSProfile(
             history=HistoryPolicy.KEEP_ALL
         )
@@ -37,23 +39,10 @@ class TankDriveNode(Node):
             self.qos_publish,
         )
 
-        self.top_left_ctrl = self.create_publisher(ControlMessage, "/top_left/control_message", self.qos_publish)
-        self.top_left_srv = self.create_client(AxisState, "/top_left/request_axis_state")
+        self.wheel_ctrl = self.create_publisher(ControlMessage, "/odrive_axis0/control_message", self.ctrl_msg_qos)
+        self.wheel_srv = self.create_client(AxisState, "/odrive_axis0/request_axis_state")
 
-        self.top_right_ctrl = self.create_publisher(ControlMessage, "/top_right/control_message", self.qos_publish)
-        self.top_right_srv = self.create_client(AxisState, "/top_right/request_axis_state")
-
-        self.bottom_left_ctrl = self.create_publisher(ControlMessage, "/bottom_left/control_message", self.qos_publish)
-        self.bottom_left_srv = self.create_client(AxisState, "/bottom_left/request_axis_state")
-
-        self.bottom_right_ctrl = self.create_publisher(ControlMessage, "/bottom_right/control_message", self.qos_publish)
-        self.bottom_right_srv = self.create_client(AxisState, "/bottom_right/request_axis_state")
-
-        self.request_closed_loop_ctrl(self.top_left_srv)
-        self.request_closed_loop_ctrl(self.top_right_srv)
-        self.request_closed_loop_ctrl(self.bottom_left_srv)
-        self.request_closed_loop_ctrl(self.bottom_right_srv)
-
+        self.request_closed_loop_ctrl(self.wheel_srv)
 
         self.has_errors = False
 
@@ -67,11 +56,10 @@ class TankDriveNode(Node):
 
     def check_srv_result(self, future):
         if(future.result().procedure_result == 0):
-            print("Motor set to CLOSED_LOOP_CTRL")
             self.get_logger().info(f'Result received successfully')
         else:
             print("CLOSED_LOOP_CTRL set failed")
-            self.get_logger().info(f'Result failure')
+            self.get_logger().info(f'Result failure: {future.result().procedure_result}')
 
     def update_linear_speed_limit(self):
         self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
@@ -82,23 +70,15 @@ class TankDriveNode(Node):
         Callback function that receives Twist messages.
         Convert Twist message to wheel speed.
         """
-        left = msg.linear.x
-        right = msg.linear.y
+        speed = msg.linear.x
 
-        out_left = ControlMessage()
-        out_left.input_mode = 0x1
-        out_left.control_mode = 0x2
-        out_left.input_vel = left
+        out = ControlMessage()
+        out.input_mode = 0x1
+        out.control_mode = 0x2
+        out.input_vel = float(speed * 6.0)
 
-        out_right = ControlMessage()
-        out_right.input_mode = 0x1
-        out_right.control_mode = 0x2
-        out_right.input_vel = right
 
-        self.top_right_ctrl.publish(out_right)
-        self.bottom_right_ctrl.publish(out_right)
-        self.top_left_ctrl.publish(out_left)
-        self.bottom_left_ctrl.publish(out_left)
+        self.wheel_ctrl.publish(out)
 
 
         
