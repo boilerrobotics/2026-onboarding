@@ -392,6 +392,3 @@ Once you're done, you can stop the nodes by pressing Ctrl-C in their respective 
 
 ### 1.10 Conclusion
 That's it for part 1! You understand the very basics of ROS2 structure and style, which will let you build more advanced projects. Next, we'll move onto the main onboarding project, which is making a wheel spin with a joystick. 
-
-
-## Part 2

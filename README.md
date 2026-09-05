@@ -1,14 +1,6 @@
 # ROS2 Humble — Stage 1 Dev Container
 
-This is the "everyone always has this, works on any laptop" environment
-described in the club's dev pipeline:
-
-- **Stage 1 (this container):** write nodes, run them against mocks / bag
-  files, catch crashes and logic bugs. No real hardware, no network
-  dependency.
-- **Stage 2:** connect to the Jetson's DDS discovery server over LAN for
-  live-data validation.
-- **Stage 3:** supervised hardware-in-the-loop testing on the actual robot.
+DevContainer for local development.
 
 ## Layout
 
@@ -25,11 +17,7 @@ club-robot/                  ← repo root (this is what gets mounted)
 └── README.md
 ```
 
-VS Code mounts this *entire folder* into the container — by default at
-`/workspaces/club-robot` (matches whatever your repo folder is named) —
-and opens the container with that as the working directory. There's no
-separate "workspace" folder to configure; the repo root **is** the colcon
-workspace root.
+VS Code mounts this *entire folder* into the container and opens the container with that as the working directory. 
 
 ## What's inside
 
