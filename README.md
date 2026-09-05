@@ -42,7 +42,7 @@ VS Code mounts this *entire folder* into the container and opens the container w
 2. Open the repo folder in VS Code.
 3. When prompted, click **"Reopen in Container"** (or run
    `Dev Containers: Reopen in Container` from the command palette).
-4. First build takes a few minutes — grab a coffee.
+4. First build takes a few minutes.
 5. Once inside, open a terminal in VS Code (it opens already inside the
    container, at the repo root) and build:
    ```bash
@@ -55,21 +55,10 @@ container is just the environment running it, not a separate copy. Edits
 in VS Code, `git` commands, etc. all act on the same files whether you run
 them from inside the container's terminal or your host's.
 
-## Creating your first package
-
-```bash
-cd src
-ros2 pkg create --build-type ament_python my_first_node --dependencies rclpy
-cd ..
-colcon build --packages-select my_first_node
-source install/setup.bash
-ros2 run my_first_node <entry_point_name>
-```
 
 ## GUI apps (rviz2, rqt) — optional, and OS-dependent
 
-Stage 1 work usually doesn't need rviz2 (that's more useful once you have
-real or bagged sensor data in Stage 2). If you do want it locally:
+To get GUI locally (not tested):
 
 **Linux**
 ```bash
@@ -105,19 +94,12 @@ software needed.
    ```
 4. Rebuild the container.
 
-GUI passthrough is genuinely the flakiest part of running ROS2 in Docker
-cross-platform — if it's fighting you, it's usually not worth the time for
-Stage 1 work. Save the fight for when you actually need to look at a live
-camera feed or TF tree (Stage 2).
 
 ## Notes
 
-- `ROS_DOMAIN_ID` is pinned to `0` in `containerEnv` for now. Once you set
-  up Stage 2 (Jetson + discovery server), you'll add the discovery server
-  address here instead — that'll be a separate doc.
+- `ROS_DOMAIN_ID` is pinned to `0` in `containerEnv` for now. 
 - `--network=host` is intentionally commented out. It behaves consistently
-  on Linux but not on Docker Desktop for Mac/Windows, and Stage 1 doesn't
-  need real network discovery anyway.
+  on Linux but not on Docker Desktop for Mac/Windows.
 - If `rosdep install` in `postCreateCommand` fails on first build, that's
   expected when `src/` is empty — it's harmless and will start finding
   real dependencies once you add packages.
