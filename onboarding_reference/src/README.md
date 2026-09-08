@@ -32,10 +32,11 @@ source /opt/ros/humble/setup.bash
 
 Best practice is to create a new directory for every new workspace. The name doesn’t matter, but it is helpful to have it indicate the purpose of the workspace. Let’s choose the directory name onboarding_ws, for Onboarding Workspace:
 
+From the root directory, run:
 
 ```bash
-mkdir -p ~/onboarding_ws/src
-cd ~/onboarding_ws/src
+mkdir -p ./onboarding_ws/src
+cd ./onboarding_ws/src
 ```
 
 Another best practice is to put any packages in your workspace into the src directory. The above code creates a src directory inside the workspace and then navigates into it.
@@ -51,10 +52,11 @@ Package creation in ROS 2 uses ament as its build system and colcon as its build
 #### Create your package
 
 Make sure you are in the src folder before running the package creation command:
+If you're in root, this will take you to src:
 ```bash
-cd ~/onboarding_ws/src
+cd ./onboarding_ws/src
 ```
-
+Then run
 ```bash
 ros2 pkg create --build-type ament_python --license Apache-2.0 <package_name>
 ```
