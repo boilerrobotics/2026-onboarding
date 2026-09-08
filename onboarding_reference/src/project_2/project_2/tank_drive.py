@@ -4,6 +4,7 @@ from odrive_can.msg import ControlMessage, ControllerStatus, ODriveStatus
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
+from rcl_interfaces.msg import SetParametersResult
 from std_msgs.msg import String
 from rclpy.qos import (
     QoSProfile,
@@ -37,11 +38,9 @@ class TankDriveNode(Node):
             self.drive_callback,
             self.qos_publish,
         )
-        self.declare_parameter("speed_limit", 5.0)
+        self.declare_parameter("max_speed", 5.0)
         self.wheel_ctrl = self.create_publisher(ControlMessage, "/odrive_axis0/control_message", self.ctrl_msg_qos)
         self.wheel_srv = self.create_client(AxisState, "/odrive_axis0/request_axis_state")
-
-
         self.has_errors = False
 
 
@@ -59,9 +58,6 @@ class TankDriveNode(Node):
             print("CLOSED_LOOP_CTRL set failed")
             self.get_logger().info(f'Result failure: {future.result().procedure_result}')
 
-    def update_linear_speed_limit(self):
-        self.linear_speed_limit = self.get_parameter("max_speed").value
-
 
     def drive_callback(self, msg: Twist):
         """
@@ -73,7 +69,7 @@ class TankDriveNode(Node):
         out = ControlMessage()
         out.input_mode = 0x1
         out.control_mode = 0x2
-        out.input_vel = float(speed * self.linear_speed_limit)
+        out.input_vel = float(speed * self.get_parameter("max_speed").value)
 
         if(msg.angular.z == 1):
             self.request_state(1)
