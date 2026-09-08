@@ -1,4 +1,3 @@
-import asyncio
 import rclpy
 from odrive_can.srv import AxisState
 from odrive_can.msg import ControlMessage, ControllerStatus, ODriveStatus
@@ -38,19 +37,18 @@ class TankDriveNode(Node):
             self.drive_callback,
             self.qos_publish,
         )
-
+        self.declare_parameter("speed_limit", 5.0)
         self.wheel_ctrl = self.create_publisher(ControlMessage, "/odrive_axis0/control_message", self.ctrl_msg_qos)
         self.wheel_srv = self.create_client(AxisState, "/odrive_axis0/request_axis_state")
 
-        self.request_closed_loop_ctrl(self.wheel_srv)
 
         self.has_errors = False
 
 
-    def request_closed_loop_ctrl(self, client):
+    def request_state(self, state):
         req = AxisState.Request()
-        req.axis_requested_state = 8
-        future = client.call_async(req)
+        req.axis_requested_state = state
+        future = self.wheel_srv.call_async(req)
         future.add_done_callback(self.check_srv_result)
         self.get_logger().info('Request sent. Yielding thread back to executor...')
 
@@ -62,7 +60,7 @@ class TankDriveNode(Node):
             self.get_logger().info(f'Result failure: {future.result().procedure_result}')
 
     def update_linear_speed_limit(self):
-        self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
+        self.linear_speed_limit = self.get_parameter("max_speed").value
 
 
     def drive_callback(self, msg: Twist):
@@ -75,8 +73,12 @@ class TankDriveNode(Node):
         out = ControlMessage()
         out.input_mode = 0x1
         out.control_mode = 0x2
-        out.input_vel = float(speed * 6.0)
+        out.input_vel = float(speed * self.linear_speed_limit)
 
+        if(msg.angular.z == 1):
+            self.request_state(1)
+        elif(msg.angular.x == 1):
+            self.request_state(8)
 
         self.wheel_ctrl.publish(out)
 
