@@ -512,16 +512,16 @@ https://github.com/odriverobotics/ros_odrive/tree/main/odrive_node
 This is the documentation for the ODrive node, and what it publishes and subscribes to. If you ever use a pre-written ROS2 node, look for documentation like this.
 You'll see that the custom types use numbers to signify states like "CLOSED_LOOP_CONTROL" and "IDLE", as well as input modes for ControlMessage. The way this works is that each number is associated with a state, and you need to use the correct numbers - to make it simpler, I'll provide you with the necessary numbers here:
 
-control_mode: always set this to 1
-input_mode: always set this to 2
+- control_mode: always set this to 1
+- input_mode: always set this to 2
 
 In the request_axis_state service,
 
-axis_requested_state: 8 for closed_loop_control, 1 for idle
+- axis_requested_state: 8 for closed_loop_control, 1 for idle
 
 The input /cmd_vel topic you're getting will be formatted like this:
-msg.linear.x will have a decimal value between 0-1. Your job is to scale this to the max_speed parameter, so that the output speed is somewhere between 0 to max_speed and proportional to this value.
-msg.angular.z will be either 0 or 1. If it's 1, make a request to ODriveNode to set axis state to IDLE. 
-msg.angular.x will be either 0 or 1. If it's 1, make a request to ODriveNode to set axis state to CLOSED_LOOP_CONTROL. 
+- msg.linear.x will have a decimal value between 0-1. Your job is to scale this to the max_speed parameter, so that the output speed is somewhere between 0 to max_speed and proportional to this value.
+- msg.angular.z will be either 0 or 1. If it's 1, make a request to ODriveNode to set axis state to IDLE. 
+- msg.angular.x will be either 0 or 1. If it's 1, make a request to ODriveNode to set axis state to CLOSED_LOOP_CONTROL. 
 
 Hint: Do all the processing and publish the ControlMessage and send the AxisState request in the /cmd_vel subscriber's callback, so you don't need a separate timer for publishing. 
