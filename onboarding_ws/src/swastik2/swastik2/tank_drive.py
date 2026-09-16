@@ -1,8 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from custom_interfaces.msg import ControlMessage
-from custom_interfaces.srv import AxisState
+from odrive_can.srv import AxisState
+from odrive_can.msg import ControlMessage, ControllerStatus, ODriveStatus
 from rcl_interfaces.msg import SetParametersResult
 from std_msgs.msg import String
 from rclpy.qos import (
@@ -67,7 +67,7 @@ class TankDriveNode(Node):
 
 
     def wheel_srv_callback(self, future):
-        if future.procedure_result()==0:
+        if future.result().procedure_result ==0:
             self.get_logger().info("Result received")
         else:
             self.get_logger().info("Failed")
@@ -79,6 +79,8 @@ class TankDriveNode(Node):
 
         out = ControlMessage()
         out.input_vel = float(speed * self.get_parameter("max_speed").value)
+        out.control_mode = 2
+        out.input_mode = 1
 
         if (msg.angular.z==1):
             self.req_state(1)
