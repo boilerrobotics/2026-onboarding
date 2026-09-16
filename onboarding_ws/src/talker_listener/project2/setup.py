@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'project_2'
+package_name = 'project2'
 
 setup(
     name=package_name,
@@ -14,7 +14,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='devuser',
-    maintainer_email='gautham.paramasivam2006@gmail.com',
+    maintainer_email='devuser@todo.todo',
     description='TODO: Package description',
     license='Apache-2.0',
     extras_require={
@@ -24,7 +24,6 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            
         ],
     },
 )
