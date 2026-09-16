@@ -505,15 +505,56 @@ You will be implementing the TankDriveNode shown in the diagram, whose purpose i
 ### Recommendations:
 First, create a new package in the same workspace you created earlier, using the same command. Then, copy the "custom_interfaces" package from the reference workspace and paste it into your workspace. This will allow you to have access to the custom types (ControlMessage and AxisState) that the ODriveNode requires. 
 
-Then, look at the definitions of each of the message/service types. As stated earlier, use the "ros2 interface" command to look at the Twist message type, as it's a default ROS2 type. The other two types are defined in the "custom_interfaces" package you copied, and in addition, take a look at this: 
+Then, look at the definitions of each of the message/service types. As stated earlier, use the "ros2 interface" command to look at the Twist message type, as it's a default ROS2 type. The other two types are defined in the "custom_interfaces" package you copied.
+For simplicity, I've provided all 3 definitions here (but you should use the above command and learn to find them yourself)
 
+Twist (input topic):
+```
+Vector3 linear
+	float64 x
+	float64 y
+	float64 z
+Vector3 angular
+	float64 x
+	float64 y
+	float64 z
+```
+
+ControlMessage (custom output topic):
+```
+uint32 control_mode
+uint32 input_mode
+float32 input_pos
+float32 input_vel
+float32 input_torque
+```
+
+AxisState (custom output service):
+Everything above the --- is the "request" part of the service call (the part the client sends to the server along with the request), and below the --- is the "response" part (the response the server provides after completing the task).
+```
+uint32 axis_requested_state
+---
+uint32 active_errors
+uint8 axis_state
+uint8 procedure_result
+```
+
+In order to be able to use these types, you need to add this to the top of your code, along with other imports (look at the talker/listener files):
+
+```python
+from geometry_msgs.msg import Twist # input type
+from custom_interfaces.msg import ControlMessage # output type
+from custom_interfaces.srv import AxisState # output service type
+```
+
+In addition, take a look at this: 
 https://github.com/odriverobotics/ros_odrive/tree/main/odrive_node
 
 This is the documentation for the ODrive node, and what it publishes and subscribes to. If you ever use a pre-written ROS2 node, look for documentation like this.
 You'll see that the custom types use numbers to signify states like "CLOSED_LOOP_CONTROL" and "IDLE", as well as input modes for ControlMessage. The way this works is that each number is associated with a state, and you need to use the correct numbers - to make it simpler, I'll provide you with the necessary numbers here:
 
-- control_mode: always set this to 1
-- input_mode: always set this to 2
+- control_mode: always set this to 2
+- input_mode: always set this to 1
 
 In the request_axis_state service,
 
@@ -525,3 +566,5 @@ The input /cmd_vel topic you're getting will be formatted like this:
 - msg.angular.x will be either 0 or 1. If it's 1, make a request to ODriveNode to set axis state to CLOSED_LOOP_CONTROL. 
 
 Hint: Do all the processing and publish the ControlMessage and send the AxisState request in the /cmd_vel subscriber's callback, so you don't need a separate timer for publishing. 
+Hint: You need a subscriber, a publisher, and a client.
+Hint: Try to look at Part 1's diagram and see how it maps to the code between Talker and Listener, and try to emulate that with this. You can copy a lot of the code to declare publishers/subscribers/clients etc. and just modify the callbacks and other functions.
