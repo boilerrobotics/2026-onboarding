@@ -38,9 +38,9 @@ class TankDriveNode(Node):
             Twist,
             'cmd_vel',
             self.subscriber_callback,
-            10)
-        self.publisher_ = self.create_publisher(ControlMessage, '/odrive0/control_message', 10)
-        self.client = self.create_client(AxisState, '/odrive0/request_axis_state')
+            self.qos_publish)
+        self.publisher_ = self.create_publisher(ControlMessage, '/odrive_axis0/control_message', self.ctrl_msg_qos)
+        self.client = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
         self.declare_parameter("max_speed", 5.0)
        
     def subscriber_callback(self, msg):
@@ -53,7 +53,7 @@ class TankDriveNode(Node):
             self.request_axis_state(8)
         control_msg.input_vel = msg.linear.x * self.get_parameter("max_speed").value
         self.publisher_.publish(control_msg)
-        self.get_logger().info(f'Publishing: velocity={control_msg.input_vel}, position={control_msg.input_pos}')
+        #self.get_logger().info(f'Publishing: velocity={control_msg.input_vel}, position={control_msg.input_pos}')
 
 
     def request_axis_state(self, num):
