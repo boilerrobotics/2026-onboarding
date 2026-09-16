@@ -1,3 +1,5 @@
+from ast import Import
+
 import rclpy
 from rclpy.node import Node
 
@@ -5,12 +7,15 @@ from std_msgs.msg import String
 from pcl_msgs.srv import UpdateFilename
 
 
+
+
+
 class Listener(Node):
 
     def __init__(self):
         super().__init__('listener')
         self.subscription = self.create_subscription(
-            String,
+            cmd_vel,
             'topic',
             self.listener_callback,
             10)

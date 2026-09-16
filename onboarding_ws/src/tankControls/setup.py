@@ -13,8 +13,8 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='devuser',
-    maintainer_email='devuser@todo.todo',
+    maintainer='ejiang1223',
+    maintainer_email='jian1223@purdue.edu',
     description='TODO: Package description',
     license='Apache-2.0',
     extras_require={
@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'tank_drive = tankControls.TankDrive:main',
         ],
     },
 )
