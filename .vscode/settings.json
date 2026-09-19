@@ -1,3 +1,5 @@
 {
-    "ROS2.distro": "humble"
+    "ROS2.distro": "humble",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "cmake.sourceDirectory": "D:/Programming/BRC-Purdue/2026-onboarding/onboarding_ws/src/custom_interfaces"
 }
