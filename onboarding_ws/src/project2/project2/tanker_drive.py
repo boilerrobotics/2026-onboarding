@@ -1,6 +1,6 @@
 import rclpy
-from custom_interfaces.srv import AxisState
-from custom_interfaces.msg import ControlMessage
+from odrive_can.srv import AxisState
+from odrive_can.msg import ControlMessage
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
